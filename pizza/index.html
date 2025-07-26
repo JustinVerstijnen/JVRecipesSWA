@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pizza Bereken Tool</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #F2F2F2;
+        color: #333;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 40px;
+    }
+
+    .container {
+        background-color: #ffffff;
+        padding: 20px 30px;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        text-align: center;
+    }
+
+    .pizza-link {
+        display: inline-block;
+        text-decoration: none;
+        margin-bottom: 15px;
+    }
+
+    .pizza-logo {
+        width: 80px;
+        height: 80px;
+        animation: spin 4s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    h2 {
+        margin-bottom: 10px;
+        font-size: 24px;
+        color: #333;
+    }
+
+    p {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    label {
+        display: block;
+        margin: 12px 0 6px;
+        font-size: 15px;
+        text-align: left;
+        color: #333;
+    }
+
+    input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+    }
+
+    .radio-group {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 10px;
+    }
+
+    .radio-group label {
+        font-size: 14px;
+        cursor: pointer;
+        color: #333;
+    }
+
+    .radio-group input {
+        margin-right: 5px;
+    }
+
+    button {
+        width: 100%;
+        margin-top: 20px;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: bold;
+        background-color: #8eafda;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #7895c1;
+    }
+
+    .result {
+        margin-top: 20px;
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 6px;
+        font-size: 15px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .result ul {
+        padding-left: 20px;
+    }
+
+    .bereiding {
+        margin-top: 15px;
+        padding: 10px;
+        background: #fff8e1;
+        border: 1px solid #f0d48a;
+        border-radius: 5px;
+        font-size: 14px;
+        color: #333;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Klikbare pizza animatie -->
+    <a href="https://recipes.justinverstijnen.nl" class="pizza-link" target="_blank" title="Bekijk meer recepten">
+        <svg class="pizza-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            <circle cx="256" cy="256" r="200" fill="#f7d794"/>
+            <path d="M256 56 A200 200 0 0 1 456 256 L256 256 Z" fill="#e17055"/>
+            <circle cx="190" cy="180" r="20" fill="#d63031"/>
+            <circle cx="320" cy="220" r="18" fill="#d63031"/>
+            <circle cx="280" cy="300" r="15" fill="#d63031"/>
+        </svg>
+    </a>
+
+    <h2>Pizza Bereken Tool</h2>
+    <p>Reken ongeveer <b>170 gram bloem per pizza</b>.</p>
+
+    <label for="bloem">Gram bloem:</label>
+    <input type="number" id="bloem" placeholder="Bijv. 500">
+
+    <label>Rijstijd:</label>
+    <div class="radio-group">
+        <label><input type="radio" name="rijstijd" value="2" checked> 2 uur</label>
+        <label><input type="radio" name="rijstijd" value="5"> 5 uur</label>
+        <label><input type="radio" name="rijstijd" value="24"> 24 uur</label>
+    </div>
+
+    <button onclick="bereken()">Bereken</button>
+
+    <div class="result" id="resultaat"></div>
+</div>
+
+<script>
+function afronden(value) {
+    return Math.round(value * 2) / 2; // afronden op 0,5
+}
+
+function bereken() {
+    let bloem = parseFloat(document.getElementById('bloem').value);
+    let rijstijd = parseInt(document.querySelector('input[name="rijstijd"]:checked').value);
+
+    if (isNaN(bloem) || bloem <= 0) {
+        document.getElementById('resultaat').innerHTML = "⚠ Vul een geldig aantal gram bloem in.";
+        return;
+    }
+
+    // Bereken aantal pizza's
+    let pizzas = bloem / 170;
+
+    // Bereken ingrediënten per 100 gram bloem
+    let factor = bloem / 100;
+    let water = afronden(56 * factor);
+    let zout = afronden(2 * factor);
+    let olie = afronden(2.5 * factor);
+
+    // Gist afhankelijk van rijstijd
+    let gistPer100 = 0;
+    if (rijstijd === 24) gistPer100 = 0.5;
+    else if (rijstijd === 5) gistPer100 = 1;
+    else if (rijstijd === 2) gistPer100 = 2;
+
+    let gist = afronden(gistPer100 * factor);
+
+    // Dynamische 2-na-laatste zin
+    let dynamischeZin = "";
+    if (rijstijd === 24) {
+        dynamischeZin = "Zet het deeg dan afgedekt in de koelkast en haal het 6 uur voor bereiding uit de koelkast.";
+    } else {
+        dynamischeZin = "Laat het deeg nu volgens bovenstaande gekozen rijstijd op kamertemperatuur en afgedekt rijzen.";
+    }
+
+    // Volledige beschrijving inclusief dynamische zin
+    let bereidingswijze = `
+        <p><b>Bereidingswijze</b></p>
+        <p>Start met het mixen van het water met het zout en de olijfolie in de beslagkom. Voeg daarna langzaam het bloem al mixend toe en mix deze met een machine tot een geheel en elastisch deeg.</p>
+        <p>Laat het deeg daarna ongeveer 20 tot 30 minuten rusten.</p>
+        <p>Kneed het deeg opnieuw goed door en verdeel het in gelijke stukken.</p>
+        <p>${dynamischeZin}</p>
+        <p>Daarna kan de pizza bereid worden en afgebakken. Eet smakelijk!</p>
+    `;
+
+    document.getElementById('resultaat').innerHTML = `
+        <p><b>Resultaat voor ${afronden(bloem)} g bloem:</b></p>
+        <p>Dit is genoeg voor ongeveer <b>${afronden(pizzas)} pizza's</b>.</p>
+        <ul>
+            <li>Water: ${water} ml</li>
+            <li>Zout: ${zout} g</li>
+            <li>Olijfolie: ${olie} g</li>
+            <li>Gist: ${gist} g (${rijstijd} uur rijzen)</li>
+        </ul>
+        <div class="bereiding">${bereidingswijze}</div>
+    `;
+}
+</script>
+
+</body>
+</html>
